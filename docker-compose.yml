@@ -1,0 +1,126 @@
+version: '3.8'
+
+services:
+  # Nginx Proxy Manager
+  proxy:
+    image: jc21/nginx-proxy-manager:latest
+    restart: unless-stopped
+    ports:
+      - "80:80" # Public HTTP Port
+      - "443:443" # Public HTTPS Port
+      - "81:81" # Admin Web Port
+    environment:
+      DISABLE_IPV6: 'true'
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    networks:
+      - nginx_network
+
+  # Nextcloud
+  nextcloud_db:
+    image: mariadb:latest
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - nextcloud_db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your_password
+    networks:
+      - nextcloud_network
+
+  nextcloud_app:
+    image: nextcloud:29
+    restart: always
+    ports:
+      - 8181:80
+    links:
+      - nextcloud_db
+    volumes:
+      - nextcloud_data:/var/www/html
+    environment:
+      MYSQL_HOST: nextcloud_db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your_password
+    networks:
+      - nextcloud_network
+      - nginx_network
+  redis:
+    image: redis:alpine
+    container_name: nextcloud_redis
+    restart: unless-stopped
+    networks:
+      - nextcloud_network
+
+  # OnlyOffice
+  onlyoffice:
+    image: onlyoffice/documentserver
+    ports:
+      - "8282:80"
+    environment:
+      - POSTGRES_DB_HOST=onlyoffice_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME=onlyoffice
+      - POSTGRES_DB_USER=onlyoffice
+      - POSTGRES_DB_PASS=onlyoffice
+    networks:
+      - onlyoffice_network
+      - nginx_network
+
+  onlyoffice_db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=onlyoffice
+      - POSTGRES_USER=onlyoffice
+      - POSTGRES_PASSWORD=onlyoffice
+    volumes:
+      - onlyoffice_db_data:/var/lib/postgresql/data
+    networks:
+      - onlyoffice_network
+
+  # Synapse
+  synapse:
+    image: matrixdotorg/synapse:latest
+    restart: unless-stopped
+    ports:
+      - "8008:8008"
+    depends_on:
+      - synapse_db
+    volumes:
+      - /home/docker/synapse/homeserver_data:/data
+    environment:
+      - SYNAPSE_SERVER_NAME=matrix.rootpath.studio
+      - SYNAPSE_REPORT_STATS=yes
+    networks:
+      - synapse_network
+      - nginx_network
+
+  synapse_db:
+    image: postgres:12-alpine
+    restart: unless-stopped
+    volumes:
+      - /home/docker/synapse/db_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=synapse
+      - POSTGRES_USER=synapse_user
+      - POSTGRES_PASSWORD=mR8NPdDpO6EysUm
+      - LC_COLLATE=C
+      - LC_CTYPE=C
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+    networks:
+      - synapse_network
+
+volumes:
+  nextcloud_db_data:
+  nextcloud_data:
+  onlyoffice_db_data:
+
+networks:
+  nginx_network:
+  nextcloud_network:
+  onlyoffice_network:
+  synapse_network:
