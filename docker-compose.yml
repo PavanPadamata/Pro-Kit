@@ -46,6 +46,7 @@ services:
       MYSQL_DATABASE: nextcloud
       MYSQL_USER: nextcloud
       MYSQL_PASSWORD: your_password
+      OVERWRITEPROTOCOL: https
     networks:
       - nextcloud_network
       - nginx_network
