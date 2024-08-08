@@ -68,6 +68,8 @@ services:
       - POSTGRES_DB_NAME=onlyoffice
       - POSTGRES_DB_USER=onlyoffice
       - POSTGRES_DB_PASS=onlyoffice
+      - JWT_SECRET=gOvxEyt2OdnMbCkCTlbEavPWBU0PRdFI
+      - JWT_HEADER=Authorization
     networks:
       - onlyoffice_network
       - nginx_network
