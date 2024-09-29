@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Variables
-COMPOSE_FILE_PATH="path/to/your/docker-compose.yml"
-BACKUP_DIR="path/to/your/backup/dir"
+COMPOSE_FILE_PATH="./docker-compose.yml"  # Assuming the compose file is in the same directory
+BACKUP_DIR="./backup"                      # Assuming the backup directory is in the same directory
 DATE=$(date +"%Y%m%d_%H%M")
+
+# Create backup directory if it doesn't exist
+mkdir -p "$BACKUP_DIR"
 
 # Function to backup
 backup() {
     echo "Starting backup..."
-
-    # Create backup directory if it doesn't exist
-    mkdir -p "$BACKUP_DIR"
 
     # Backup Nextcloud data
     echo "Backing up Nextcloud data..."
