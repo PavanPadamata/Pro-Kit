@@ -7,7 +7,6 @@ LOG_DIR="./logs"
 TIMESTAMP=$(date +"%Y%m%d%H%M")
 BACKUP_PATH="$BACKUP_DIR/$TIMESTAMP"
 LOG_FILE="$LOG_DIR/backup_restore_$TIMESTAMP.log"
-COMPRESSION="tar.gz"
 
 # Create necessary directories
 mkdir -p "$BACKUP_PATH"
@@ -31,7 +30,7 @@ backup_nextcloud() {
     log_message "Nextcloud app data backup completed."
 
     log_message "Backing up Nextcloud database (MariaDB)..."
-    docker exec $(docker-compose ps -q nextcloud_db) sh -c 'exec mysqldump --all-databases -uroot -p"$MYSQL_ROOT_PASSWORD"' > $BACKUP_PATH/nextcloud_db_backup.sql
+    docker exec $(docker-compose ps -q nextcloud_db) sh -c 'exec mysqldump --all-databases -uroot -p"$MYSQL_ROOT_PASSWORD"' > "$BACKUP_PATH/nextcloud_db_backup.sql"
     log_message "Nextcloud database backup completed."
 }
 
@@ -41,7 +40,7 @@ backup_onlyoffice() {
     log_message "OnlyOffice data backup completed."
 
     log_message "Backing up OnlyOffice database (PostgreSQL)..."
-    docker exec $(docker-compose ps -q onlyoffice_db) pg_dumpall -U onlyoffice > $BACKUP_PATH/onlyoffice_db_backup.sql
+    docker exec $(docker-compose ps -q onlyoffice_db) pg_dumpall -U onlyoffice > "$BACKUP_PATH/onlyoffice_db_backup.sql"
     log_message "OnlyOffice database backup completed."
 }
 
@@ -51,7 +50,7 @@ backup_synapse() {
     log_message "Synapse app data backup completed."
 
     log_message "Backing up Synapse database (PostgreSQL)..."
-    docker exec $(docker-compose ps -q synapse_db) pg_dumpall -U synapse_user > $BACKUP_PATH/synapse_db_backup.sql
+    docker exec $(docker-compose ps -q synapse_db) pg_dumpall -U synapse_user > "$BACKUP_PATH/synapse_db_backup.sql"
     log_message "Synapse database backup completed."
 }
 
@@ -81,7 +80,7 @@ restore_nextcloud() {
     log_message "Nextcloud app data restore completed."
 
     log_message "Restoring Nextcloud database..."
-    docker exec -i $(docker-compose ps -q nextcloud_db) mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < $BACKUP_PATH/nextcloud_db_backup.sql
+    docker exec -i $(docker-compose ps -q nextcloud_db) mysql -uroot -p"$MYSQL_ROOT_PASSWORD" < "$BACKUP_PATH/nextcloud_db_backup.sql"
     log_message "Nextcloud database restore completed."
 }
 
@@ -93,7 +92,7 @@ restore_onlyoffice() {
     log_message "OnlyOffice app data restore completed."
 
     log_message "Restoring OnlyOffice database..."
-    docker exec -i $(docker-compose ps -q onlyoffice_db) psql -U onlyoffice < $BACKUP_PATH/onlyoffice_db_backup.sql
+    docker exec -i $(docker-compose ps -q onlyoffice_db) psql -U onlyoffice < "$BACKUP_PATH/onlyoffice_db_backup.sql"
     log_message "OnlyOffice database restore completed."
 }
 
@@ -105,7 +104,7 @@ restore_synapse() {
     log_message "Synapse app data restore completed."
 
     log_message "Restoring Synapse database..."
-    docker exec -i $(docker-compose ps -q synapse_db) psql -U synapse_user < $BACKUP_PATH/synapse_db_backup.sql
+    docker exec -i $(docker-compose ps -q synapse_db) psql -U synapse_user < "$BACKUP_PATH/synapse_db_backup.sql"
     log_message "Synapse database restore completed."
 }
 
