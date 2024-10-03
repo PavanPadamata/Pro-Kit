@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  onlyoffice:
+    image: onlyoffice/documentserver
+    ports:
+      - "8282:80"
+    environment:
+      - POSTGRES_DB_HOST=onlyoffice_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME=onlyoffice
+      - POSTGRES_DB_USER=onlyoffice
+      - POSTGRES_DB_PASS=onlyoffice
+      - JWT_SECRET=gOvxEyt2OdnMbCkCTlbEavPWBU0PRdFI
+      - JWT_HEADER=Authorization
+    networks:
+      - onlyoffice_network
+      - nginx_network
+
+  onlyoffice_db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=onlyoffice
+      - POSTGRES_USER=onlyoffice
+      - POSTGRES_PASSWORD=onlyoffice
+    volumes:
+      - ./onlyoffice_db_data:/var/lib/postgresql/data
+    networks:
+      - onlyoffice_network
+
+networks:
+  nginx_network:
+  onlyoffice_network:
+
+volumes:
+  onlyoffice_db_data:
