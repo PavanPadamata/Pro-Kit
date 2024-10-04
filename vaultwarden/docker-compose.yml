@@ -1,22 +1,42 @@
-version: '3'
-
+version: "3"
 services:
   vaultwarden:
     image: vaultwarden/server:latest
     container_name: vaultwarden
-    environment:
-      - ADMIN_TOKEN=<your_admin_token>
-      - WEBSOCKET_ENABLED=true
-      - DOMAIN=https://vault.rootpath.studio
-    volumes:
-      - ./vw-data:/data  # Persistent storage in the current directory
-    networks:
-      - vaultwarden_network  # Private network
-      - nginx_network         # Nginx Proxy Manager network
     restart: unless-stopped
+    ports:
+      - 9445:80  # Map your custom port to the container's port
+    volumes:
+      - ./bitwarden:/data:rw
+    environment:
+#      environment:
+      - DOMAIN=https://vault.rootpath.studio
+      - LOGIN_RATELIMIT_MAX_BURST=10
+      - LOGIN_RATELIMIT_SECONDS=60
+      - ADMIN_RATELIMIT_MAX_BURST=10
+      - ADMIN_RATELIMIT_SECONDS=60
+      - ADMIN_TOKEN=dc34ea5cdd9f3351510534765a87a9d2
+      - SENDS_ALLOWED=true
+      - EMERGENCY_ACCESS_ALLOWED=true
+      - WEB_VAULT_ENABLED=true
+      - SIGNUPS_ALLOWED=false
+      - SIGNUPS_VERIFY=true
+      - SIGNUPS_VERIFY_RESEND_TIME=3600
+      - SIGNUPS_VERIFY_RESEND_LIMIT=5
+      - SIGNUPS_DOMAINS_WHITELIST=vault.rootpath.studio
+      - SMTP_HOST=smtp.gmail.com
+      - SMTP_FROM=its4tech54@gmail.com
+      - SMTP_FROM_NAME=Vaultwarden
+      - SMTP_SECURITY=starttls
+      - SMTP_PORT=587
+      - SMTP_USERNAME=its4tech54@gmail.com
+      - SMTP_PASSWORD=uwny skti ngbr kxnr
+
+      - SMTP_AUTH_MECHANISM="Login"
+
+    networks:
+      - nginx_network  # Connect to the existing nginx_network
 
 networks:
-  vaultwarden_network:
-    driver: bridge  # Private bridge network for Vaultwarden
   nginx_network:
-    external: true  # Connect to the existing Nginx Proxy Manager network
+    external: true  # Indicate that this is an external network
