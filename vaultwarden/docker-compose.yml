@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    environment:
+      - ADMIN_TOKEN=<your_admin_token>
+      - WEBSOCKET_ENABLED=true
+      - DOMAIN=https://vault.rootpath.studio
+    volumes:
+      - ./vw-data:/data  # Persistent storage in the current directory
+    networks:
+      - vaultwarden_network  # Private network
+      - nginx_network         # Nginx Proxy Manager network
+    restart: unless-stopped
+
+networks:
+  vaultwarden_network:
+    driver: bridge  # Private bridge network for Vaultwarden
+  nginx_network:
+    external: true  # Connect to the existing Nginx Proxy Manager network
