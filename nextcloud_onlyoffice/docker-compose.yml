@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # Nextcloud Database
+  nextcloud_db:
+    image: mariadb:latest
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW
+    volumes:
+      - nextcloud_db_data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: your_root_password
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your_password
+    networks:
+      - nextcloud_network
+
+  # Nextcloud Application
+  nextcloud_app:
+    image: nextcloud:29
+    restart: always
+    ports:
+      - 8181:80
+    links:
+      - nextcloud_db
+      - redis
+    volumes:
+      - nextcloud_data:/var/www/html
+    environment:
+      MYSQL_HOST: nextcloud_db
+      MYSQL_DATABASE: nextcloud
+      MYSQL_USER: nextcloud
+      MYSQL_PASSWORD: your_password
+      OVERWRITEPROTOCOL: https
+      REDIS_HOST: redis
+    networks:
+      - nextcloud_network
+      - nginx_network
+
+  # Redis (For Nextcloud caching)
+  redis:
+    image: redis:alpine
+    container_name: nextcloud_redis
+    restart: unless-stopped
+    networks:
+      - nextcloud_network
+
+  # OnlyOffice Document Server
+  onlyoffice:
+    image: onlyoffice/documentserver
+    ports:
+      - "8282:80"
+    environment:
+      - POSTGRES_DB_HOST=onlyoffice_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME=onlyoffice
+      - POSTGRES_DB_USER=onlyoffice
+      - POSTGRES_DB_PASS=onlyoffice
+      - JWT_SECRET=gOvxEyt2OdnMbCkCTlbEavPWBU0PRdFI
+      - JWT_HEADER=Authorization
+    networks:
+      - onlyoffice_network
+      - nginx_network
+
+  # OnlyOffice Database
+  onlyoffice_db:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=onlyoffice
+      - POSTGRES_USER=onlyoffice
+      - POSTGRES_PASSWORD=onlyoffice
+    volumes:
+      - onlyoffice_db_data:/var/lib/postgresql/data
+    networks:
+      - onlyoffice_network
+
+volumes:
+  nextcloud_db_data:
+  nextcloud_data:
+  onlyoffice_db_data:
+
+networks:
+  nginx_network:
+  nextcloud_network:
+  onlyoffice_network:
