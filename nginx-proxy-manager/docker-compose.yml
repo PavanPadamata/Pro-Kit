@@ -14,7 +14,9 @@ services:
       - ./data:/data
       - ./letsencrypt:/etc/letsencrypt
     networks:
-      - nginx_network
+      - nginx_network  # Use the existing nginx_network
 
 networks:
   nginx_network:
+    external: true  # Specify that it's an external network
+
