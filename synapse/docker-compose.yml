@@ -9,7 +9,7 @@ services:
     depends_on:
       - synapse_db
     volumes:
-      - ./synapse_data:/data
+      - ./data:/data
     environment:
       - SYNAPSE_SERVER_NAME=matrix.rootpath.studio
       - SYNAPSE_REPORT_STATS=yes
@@ -37,5 +37,5 @@ networks:
   synapse_network:
 
 volumes:
-  synapse_data:
+  data:
   synapse_db_data:
