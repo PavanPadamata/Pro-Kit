@@ -24,15 +24,25 @@ services:
       - SIGNUPS_VERIFY_RESEND_TIME=3600
       - SIGNUPS_VERIFY_RESEND_LIMIT=5
       - SIGNUPS_DOMAINS_WHITELIST=vault.rootpath.studio
-      - SMTP_HOST=smtp.gmail.com
-      - SMTP_FROM=its4tech54@gmail.com
+      - SMTP_HOST=mail.rootpath.studio
+      - SMTP_FROM=info@rootpath.studio
       - SMTP_FROM_NAME=Vaultwarden
       - SMTP_SECURITY=starttls
       - SMTP_PORT=587
-      - SMTP_USERNAME=its4tech54@gmail.com
-      - SMTP_PASSWORD=uwny skti ngbr kxnr
-
+      - SMTP_USERNAME=info@rootpath.studio
+      - SMTP_PASSWORD=16,=,RouSti
       - SMTP_AUTH_MECHANISM="Login"
+
+      #- SMTP_HOST=smtp.gmail.com
+      #- SMTP_FROM=its4tech54@gmail.com
+      #- SMTP_FROM_NAME=Vaultwarden
+      #- SMTP_SECURITY=starttls
+      #- SMTP_PORT=587
+      #- SMTP_USERNAME=its4tech54@gmail.com
+      #- SMTP_PASSWORD=uwny skti ngbr kxnr
+
+      #- SMTP_AUTH_MECHANISM="Login"
+
 
     networks:
       - nginx_network  # Connect to the existing nginx_network
